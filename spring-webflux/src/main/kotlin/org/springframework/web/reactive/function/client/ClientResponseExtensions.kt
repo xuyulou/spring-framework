@@ -16,8 +16,10 @@
 
 package org.springframework.web.reactive.function.client
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactive.awaitSingle
+import kotlinx.coroutines.reactive.asFlow
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.ResponseEntity
 import reactor.core.publisher.Flux
@@ -44,6 +46,15 @@ inline fun <reified T : Any> ClientResponse.bodyToMono(): Mono<T> =
  */
 inline fun <reified T : Any> ClientResponse.bodyToFlux(): Flux<T> =
 		bodyToFlux(object : ParameterizedTypeReference<T>() {})
+
+/**
+ * Coroutines [kotlinx.coroutines.flow.Flow] based variant of [ClientResponse.bodyToFlux].
+ *
+ * @author Sebastien Deleuze
+ * @since 5.2
+ */
+inline fun <reified T : Any> ClientResponse.bodyToFlow(): Flow<T> =
+		bodyToFlux<T>().asFlow()
 
 /**
  * Extension for [ClientResponse.toEntity] providing a `toEntity<Foo>()` variant

@@ -18,6 +18,7 @@ package org.springframework.core.annotation;
 
 import java.lang.annotation.Annotation;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -27,7 +28,7 @@ import java.util.function.Predicate;
 import org.springframework.lang.Nullable;
 
 /**
- * A {@link AbstractMergedAnnotation} used as the implementation of
+ * An {@link AbstractMergedAnnotation} used as the implementation of
  * {@link MergedAnnotation#missing()}.
  *
  * @author Phillip Webb
@@ -62,12 +63,22 @@ final class MissingMergedAnnotation<A extends Annotation> extends AbstractMerged
 
 	@Override
 	@Nullable
-	public MergedAnnotation<?> getParent() {
+	public MergedAnnotation<?> getMetaSource() {
 		return null;
 	}
 
 	@Override
-	public int getDepth() {
+	public MergedAnnotation<?> getRoot() {
+		return this;
+	}
+
+	@Override
+	public List<Class<? extends Annotation>> getMetaTypes() {
+		return Collections.emptyList();
+	}
+
+	@Override
+	public int getDistance() {
 		return -1;
 	}
 
@@ -76,6 +87,7 @@ final class MissingMergedAnnotation<A extends Annotation> extends AbstractMerged
 		return -1;
 	}
 
+	@Override
 	public boolean hasNonDefaultValue(String attributeName) {
 		throw new NoSuchElementException(
 				"Unable to check non-default value for missing annotation");
@@ -108,12 +120,17 @@ final class MissingMergedAnnotation<A extends Annotation> extends AbstractMerged
 	}
 
 	@Override
-	public Map<String, Object> asMap(MapValues... options) {
+	public AnnotationAttributes asAnnotationAttributes(Adapt... adaptations) {
+		return new AnnotationAttributes();
+	}
+
+	@Override
+	public Map<String, Object> asMap(Adapt... adaptations) {
 		return Collections.emptyMap();
 	}
 
 	@Override
-	public <T extends Map<String, Object>> T asMap(Function<MergedAnnotation<?>, T> factory, MapValues... options) {
+	public <T extends Map<String, Object>> T asMap(Function<MergedAnnotation<?>, T> factory, Adapt... adaptations) {
 		return factory.apply(this);
 	}
 
@@ -144,6 +161,7 @@ final class MissingMergedAnnotation<A extends Annotation> extends AbstractMerged
 				"Unable to get attribute value for missing annotation");
 	}
 
+	@Override
 	protected A createSynthesized() {
 		throw new NoSuchElementException("Unable to synthesize missing annotation");
 	}
